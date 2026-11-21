@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tickforge Arcana UI</title>
-  <link rel="stylesheet" href="arcana-ui.css" />
+  <title>Tickforge UI Kit</title>
+  <link rel="stylesheet" href="tickforge-ui.css" />
   <script src="theme-designer.js" defer></script>
   <style>
     body { min-height: 100vh; }
@@ -19,109 +19,106 @@
 </head>
 <body>
   <main class="demo-shell">
-    <header class="arcana-panel arcana-panel-raised arcana-row arcana-between" style="margin-bottom:14px">
+    <header class="tf-panel tf-panel-raised tf-row tf-between" style="margin-bottom:14px">
       <div>
-        <div class="arcana-eyebrow">Tickforge interface kit</div>
-        <h1 class="arcana-title" style="margin:4px 0 0">Combat Console</h1>
+        <div class="tf-eyebrow">Tickforge interface kit</div>
+        <h1 class="tf-title" style="margin:4px 0 0">Combat Console</h1>
       </div>
-      <button class="arcana-button arcana-button-primary" type="button" data-open-designer>Customize UI</button>
+      <button class="tf-button tf-button-primary" type="button" data-open-designer>Customize UI</button>
     </header>
 
     <div class="demo-grid">
-      <section class="arcana-stack">
-        <article class="arcana-panel arcana-hero">
-          <div class="arcana-stack" style="flex:1">
-            <span class="arcana-eyebrow">Bulwark</span>
-            <strong class="arcana-title-lg">Templar</strong>
-            <span class="arcana-muted">Level 42 · Zeal</span>
+      <section class="tf-stack">
+        <article class="tf-panel tf-hero">
+          <div class="tf-stack" style="flex:1">
+            <span class="tf-eyebrow">Bulwark</span>
+            <strong class="tf-title-lg">Templar</strong>
+            <span class="tf-muted">Level 42 · Zeal</span>
           </div>
-          <button class="arcana-button arcana-button-icon" type="button" aria-label="View character">›</button>
+          <button class="tf-button tf-button-icon" type="button" aria-label="View character">›</button>
         </article>
 
-        <article class="arcana-panel">
-          <div class="arcana-row arcana-between">
-            <strong>Priority deck</strong>
-            <span class="arcana-tag">Live</span>
-          </div>
-          <div class="arcana-grid arcana-grid-5" style="margin-top:12px">
-            <button class="arcana-slot arcana-slot-active" type="button"><b>01</b><span>Shield Bash</span></button>
-            <button class="arcana-slot" type="button"><b>02</b><span>Bastion</span></button>
-            <button class="arcana-slot" type="button"><b>03</b><span>Cleave</span></button>
-            <button class="arcana-slot" type="button"><b>04</b><span>Solar</span></button>
-            <button class="arcana-slot" type="button"><b>05</b><span>Judgment</span></button>
+        <article class="tf-panel">
+          <div class="tf-row tf-between"><strong>Priority deck</strong><span class="tf-tag">Live</span></div>
+          <div class="tf-grid tf-grid-5" style="margin-top:12px">
+            <button class="tf-slot tf-slot-active" type="button"><b>01</b><span>Shield Bash</span></button>
+            <button class="tf-slot" type="button"><b>02</b><span>Bastion</span></button>
+            <button class="tf-slot" type="button"><b>03</b><span>Cleave</span></button>
+            <button class="tf-slot" type="button"><b>04</b><span>Solar</span></button>
+            <button class="tf-slot" type="button"><b>05</b><span>Judgment</span></button>
           </div>
         </article>
 
         <div class="demo-row">
-          <article class="arcana-panel">
+          <article class="tf-panel">
             <strong>Combat</strong>
             <div class="meter-list" style="margin-top:12px">
-              <div><div class="arcana-meter-label"><span>Life</span><b>1,150 / 1,150</b></div><div class="arcana-meter"><i class="arcana-meter-fill life" style="width:100%"></i></div></div>
-              <div><div class="arcana-meter-label"><span>Zeal</span><b>68 / 100</b></div><div class="arcana-meter"><i class="arcana-meter-fill zeal" style="width:68%"></i></div></div>
+              <div><div class="tf-meter-label"><span>Life</span><b>1,150 / 1,150</b></div><div class="tf-meter"><i class="tf-meter-fill tf-meter-fill-life" style="width:100%"></i></div></div>
+              <div><div class="tf-meter-label"><span>Zeal</span><b>68 / 100</b></div><div class="tf-meter"><i class="tf-meter-fill tf-meter-fill-resource" style="width:68%"></i></div></div>
             </div>
           </article>
-          <article class="arcana-panel">
+          <article class="tf-panel">
             <strong>Encounter</strong>
-            <div class="demo-grid" style="grid-template-columns:1fr; margin-top:12px">
-              <div class="arcana-row arcana-between"><span>Elite Dreadguard</span><b class="arcana-danger">2,100</b></div>
-              <div class="arcana-meter"><i class="arcana-meter-fill danger" style="width:62%"></i></div>
+            <div class="tf-stack" style="margin-top:12px">
+              <div class="tf-row tf-between"><span>Elite Dreadguard</span><b class="tf-danger">2,100</b></div>
+              <div class="tf-meter"><i class="tf-meter-fill tf-meter-fill-danger" style="width:62%"></i></div>
             </div>
           </article>
         </div>
       </section>
 
-      <aside class="arcana-stack">
-        <article class="arcana-panel">
-          <div class="arcana-row arcana-between"><strong>Loadout</strong><span class="arcana-muted">5 / 5</span></div>
+      <aside class="tf-stack">
+        <article class="tf-panel">
+          <div class="tf-row tf-between"><strong>Loadout</strong><span class="tf-muted">5 / 5</span></div>
           <div class="inventory" style="margin-top:12px">
-            <button class="arcana-inventory-slot" type="button" aria-label="Weapon">W</button>
-            <button class="arcana-inventory-slot" type="button" aria-label="Offhand">O</button>
-            <button class="arcana-inventory-slot" type="button" aria-label="Armor">A</button>
-            <button class="arcana-inventory-slot" type="button" aria-label="Ring">R</button>
+            <button class="tf-inventory-slot" type="button" aria-label="Weapon">W</button>
+            <button class="tf-inventory-slot" type="button" aria-label="Offhand">O</button>
+            <button class="tf-inventory-slot" type="button" aria-label="Armor">A</button>
+            <button class="tf-inventory-slot" type="button" aria-label="Ring">R</button>
           </div>
         </article>
 
-        <article class="arcana-panel">
+        <article class="tf-panel">
           <strong>Navigation</strong>
-          <div class="arcana-tabs" role="tablist" style="margin-top:12px">
-            <button class="arcana-tab active" type="button">Combat</button>
-            <button class="arcana-tab" type="button">Build</button>
-            <button class="arcana-tab" type="button">Codex</button>
+          <div class="tf-tabs" role="tablist" style="margin-top:12px">
+            <button class="tf-tab tf-tab-active" type="button">Combat</button>
+            <button class="tf-tab" type="button">Build</button>
+            <button class="tf-tab" type="button">Codex</button>
           </div>
         </article>
 
-        <article class="arcana-panel">
+        <article class="tf-panel">
           <strong>Quick actions</strong>
-          <div class="arcana-stack" style="margin-top:12px">
-            <button class="arcana-button arcana-button-primary" type="button">Run 60-second sim</button>
-            <button class="arcana-button" type="button">Pin baseline</button>
-            <button class="arcana-button arcana-button-danger" type="button">Reset build</button>
+          <div class="tf-stack" style="margin-top:12px">
+            <button class="tf-button tf-button-primary" type="button">Run 60-second sim</button>
+            <button class="tf-button" type="button">Pin baseline</button>
+            <button class="tf-button tf-button-danger" type="button">Reset build</button>
           </div>
         </article>
       </aside>
     </div>
   </main>
 
-  <div class="arcana-modal-backdrop" hidden>
-    <section class="arcana-modal" role="dialog" aria-modal="true" aria-labelledby="designer-title">
-      <header class="arcana-row arcana-between">
-        <div><div class="arcana-eyebrow">Theme designer</div><h2 id="designer-title" class="arcana-title" style="margin:4px 0 0">UI appearance</h2></div>
-        <button class="arcana-button arcana-button-icon" type="button" data-close-designer aria-label="Close">×</button>
+  <div class="tf-modal-backdrop" hidden>
+    <section class="tf-modal" role="dialog" aria-modal="true" aria-labelledby="designer-title">
+      <header class="tf-row tf-between">
+        <div><div class="tf-eyebrow">Theme designer</div><h2 id="designer-title" class="tf-title" style="margin:4px 0 0">UI appearance</h2></div>
+        <button class="tf-button tf-button-icon" type="button" data-close-designer aria-label="Close">×</button>
       </header>
-      <div class="arcana-designer" style="margin-top:16px">
+      <div class="tf-designer" style="margin-top:16px">
         <label>Preset<select data-theme-preset></select></label>
         <label>Main color<input type="color" data-theme-main /></label>
         <label>Panel color<input type="color" data-theme-panel /></label>
         <label>Accent color<input type="color" data-theme-accent /></label>
         <label>Text color<input type="color" data-theme-text /></label>
-        <label>Texture<select data-theme-pattern><option value="plain">Plain</option><option value="rings">Rings</option><option value="stars">Stars</option><option value="grid">Grid</option><option value="diagonal">Diagonal</option><option value="contours">Contours</option><option value="arcane">Arcane</option></select></label>
+        <label>Texture<select data-theme-pattern><option value="plain">Plain</option><option value="rings">Rings</option><option value="stars">Stars</option><option value="grid">Grid</option><option value="diagonal">Diagonal</option><option value="contours">Contours</option></select></label>
         <label>Button style<select data-theme-button><option value="solid">Solid</option><option value="outline">Outline</option><option value="ghost">Ghost</option></select></label>
         <label>Corner radius<input type="range" min="4" max="18" step="1" data-theme-radius /></label>
         <label>Texture intensity<input type="range" min="0" max="18" step="1" data-theme-texture /></label>
       </div>
-      <footer class="arcana-row" style="justify-content:flex-end;margin-top:16px">
-        <button class="arcana-button" type="button" data-reset-theme>Reset</button>
-        <button class="arcana-button arcana-button-primary" type="button" data-close-designer>Done</button>
+      <footer class="tf-row" style="justify-content:flex-end;margin-top:16px">
+        <button class="tf-button" type="button" data-reset-theme>Reset</button>
+        <button class="tf-button tf-button-primary" type="button" data-close-designer>Done</button>
       </footer>
     </section>
   </div>

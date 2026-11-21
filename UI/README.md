@@ -1,53 +1,59 @@
 # Tickforge UI Kit
 
-A framework-free Arcana-inspired interface kit for Tickforge. It provides reusable CSS classes, a live HTML showcase, theme presets, and a saved in-browser theme designer.
+A framework-free interface kit derived from Arcana's website design language.
 
-## Open the demo
+## Demo
 
-Open `UI/index.html` in a browser, or serve the repository:
+Open `UI/index.html` directly or serve the repository:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then visit `http://localhost:8000/UI/`.
+Visit `http://localhost:8000/UI/`.
 
-## Include it in Tickforge
+## Integration
+
+Link this stylesheet and script from Tickforge pages:
 
 ```html
-<link rel="stylesheet" href="./UI/arcana-ui.css" />
+<link rel="stylesheet" href="./UI/tickforge-ui.css" />
 <script src="./UI/theme-designer.js" defer></script>
 ```
 
-For pages that have theme controls, add `data-open-designer` to the button that opens the designer and include the modal markup from `UI/index.html`.
+For theme controls, add `data-open-designer` to the trigger and include the modal markup from `UI/index.html`.
 
-## Reusable classes
+## Core classes
 
-- `arcana-panel`, `arcana-panel-raised`
-- `arcana-stack`, `arcana-row`, `arcana-between`
-- `arcana-button`, `arcana-button-primary`, `arcana-button-danger`
-- `arcana-tabs`, `arcana-tab`
-- `arcana-slot`, `arcana-slot-active`
-- `arcana-inventory-slot`
-- `arcana-meter`, `arcana-meter-fill`
-- `arcana-modal`, `arcana-modal-backdrop`
-- `arcana-designer`
+- `tf-panel`, `tf-panel-raised`
+- `tf-stack`, `tf-row`, `tf-between`
+- `tf-button`, `tf-button-primary`, `tf-button-danger`
+- `tf-tabs`, `tf-tab`
+- `tf-slot`, `tf-slot-active`
+- `tf-inventory-slot`
+- `tf-meter`, `tf-meter-fill`
+- `tf-modal`, `tf-modal-backdrop`
+- `tf-designer`
 
 ## Theme variables
 
 ```css
 :root {
-  --arc-bg: #0b0e16;
-  --arc-panel: #171b28;
-  --arc-panel-raised: #1f2433;
-  --arc-accent: #bba4ff;
-  --arc-text: #f5f5fb;
-  --arc-muted: #a6aabd;
-  --arc-border: #34394d;
-  --arc-danger: #ef6f7d;
-  --arc-success: #67c995;
-  --arc-radius: 12px;
+  --tf-bg: #0b0e16;
+  --tf-panel: #171b28;
+  --tf-panel-raised: #1f2433;
+  --tf-accent: #bba4ff;
+  --tf-text: #f5f5fb;
+  --tf-muted: #a6aabd;
+  --tf-border: #34394d;
+  --tf-danger: #ef6f7d;
+  --tf-success: #67c995;
+  --tf-radius: 12px;
 }
 ```
 
-The designer saves theme choices in `localStorage` under `tickforge-ui-theme-v1`.
+The theme designer stores its settings in `localStorage` under `tickforge-ui-theme-v1`.
+
+## Scope
+
+This package contains presentation patterns only. It does not copy Arcana game data, routes, server code, accounts, or Arcana-specific codex records.
