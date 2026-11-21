@@ -1,11 +1,1792 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tickforge</title>
-  </head>
-  <body>
-    <h1>Tickforge</h1>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tickforge — Sandbox Combat Sim & Codex Studio</title>
+  <style>
+    :root {
+      --bg: #16171a;
+      --surface: #1f2126;
+      --surface-alt: #191b1f;
+      --border: #2e323b;
+      --text: #e2e4e9;
+      --muted: #8e94a2;
+
+      /* Damage Type Palette */
+      --phys: #cbd5e1;
+      --light: #38bdf8;
+      --fire: #f97316;
+      --poison: #22c55e;
+      --bleed: #ef4444;
+      --accent: #eab308;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+      display: flex;
+      justify-content: center;
+      min-height: 100dvh;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      gap: 12px;
+    }
+
+    /* ================= HEADER & NAV ================= */
+    .topbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand {
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    select, input, textarea {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 7px 9px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--light);
+    }
+
+    button {
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: var(--muted); }
+    button.primary { background: #263242; border-color: #3b5270; color: #e2f1ff; }
+    button.active { background: #2a2d36; border-color: var(--accent); color: var(--accent); }
+    button.danger { border-color: #5c2828; color: #fca5a5; }
+
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .nav-tab {
+      padding: 10px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .nav-tab.active {
+      color: var(--text);
+      border-color: var(--accent);
+      background: #23252b;
+    }
+
+    /* ================= LAYOUT & CARDS ================= */
+    .view-section { display: none; flex-direction: column; gap: 12px; }
+    .view-section.active { display: flex; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 740px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .num { font-variant-numeric: tabular-nums; }
+
+    /* ================= BARS & TAGS ================= */
+    .bar-wrap {
+      width: 100%;
+      height: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .bar-fill { height: 100%; width: 0%; transition: width 0.08s linear; }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 24px;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .dmg-physical { color: var(--phys); }
+    .dmg-lightning { color: var(--light); }
+    .dmg-fire { color: var(--fire); }
+    .dmg-poison { color: var(--poison); }
+    .dmg-bleed { color: var(--bleed); }
+
+    /* ================= ENEMY & HERO STAGE ================= */
+    .combatant-box {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .enemy-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .enemy-item {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 9px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .enemy-item.primary-target { border-left: 3px solid var(--accent); }
+
+    /* ================= 5-SLOT DECK ================= */
+    .deck-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 560px) {
+      .deck-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .deck-slot {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .deck-slot.ready { border-top: 2px solid var(--accent); }
+
+    /* ================= LOG & TELEMETRY ================= */
+    .log-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      height: 190px;
+      overflow-y: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .stat-table {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .stat-cell {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 9px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .form-field.full { grid-column: 1 / -1; }
+
+    .list-item {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 9px 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="brand">
+        <span>TICKFORGE</span>
+        <span class="badge-pill">0.1s TICK SANDBOX</span>
+      </div>
+      <div class="controls-row">
+        <select id="preset-select" title="Load Build Preset"></select>
+        <select id="encounter-select" title="Encounter Tier">
+          <option value="trash">Trash Wave (3 Mobs)</option>
+          <option value="elite">Elite Pack (2 Mobs)</option>
+          <option value="boss">Solo Boss (1v1)</option>
+        </select>
+        <button id="btn-speed-1" class="active">1x</button>
+        <button id="btn-speed-2">2x</button>
+        <button id="btn-speed-5">5x</button>
+        <button id="btn-pause">Pause</button>
+        <button id="btn-reset">Reset Fight</button>
+      </div>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-view="combat">1. Combat &amp; Sim</button>
+      <button class="nav-tab" data-view="build">2. Build Assembler</button>
+      <button class="nav-tab" data-view="codex">3. Codex Forge</button>
+      <button class="nav-tab" data-view="io">4. Import / Export</button>
+    </nav>
+
+    <!-- ==================== VIEW 1: COMBAT & SIM ==================== -->
+    <section id="view-combat" class="view-section active">
+      <div class="grid-2">
+        <!-- HERO STATUS -->
+        <div class="card">
+          <div class="card-header">
+            <span id="hero-header-label">Templar — 1H Mace &amp; Shield</span>
+            <span class="num" id="sim-clock">0.0s</span>
+          </div>
+
+          <div class="combatant-box">
+            <div class="row-between">
+              <strong>Life</strong>
+              <span class="num" id="hero-hp-text">1000 / 1000</span>
+            </div>
+            <div class="bar-wrap"><div class="bar-fill" id="hero-hp-bar" style="background:#22c55e;width:100%;"></div></div>
+
+            <div class="row-between" style="margin-top:4px;">
+              <strong id="hero-res-label">Zeal</strong>
+              <span class="num" id="hero-res-text">0 / 100</span>
+            </div>
+            <div class="bar-wrap"><div class="bar-fill" id="hero-res-bar" style="background:#eab308;width:0%;"></div></div>
+
+            <div class="row-between" style="margin-top:4px;">
+              <span style="color:var(--muted);font-size:12px;" id="cast-status">Ready / Auto-Attacking</span>
+              <span class="num" style="font-size:12px;" id="gcd-status">GCD: 1.5s</span>
+            </div>
+            <div class="bar-wrap" style="height:6px;"><div class="bar-fill" id="cast-bar" style="background:#38bdf8;width:0%;"></div></div>
+          </div>
+
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;">Active Counters, Stacks &amp; Buffs</div>
+          <div class="chip-row" id="hero-counters"></div>
+        </div>
+
+        <!-- ENEMY PACK STAGE -->
+        <div class="card">
+          <div class="card-header">
+            <span id="encounter-title">Encounter: Trash Wave</span>
+            <span class="num">Kills: <strong id="kill-count">0</strong></span>
+          </div>
+          <div class="enemy-list" id="enemy-list"></div>
+        </div>
+      </div>
+
+      <!-- 5-SLOT PRIORITY DECK -->
+      <div class="card">
+        <div class="card-header">
+          <span>Automated 5-Slot Priority Deck (Top-to-Bottom Evaluation Every 0.1s)</span>
+          <span class="num">Live DPS: <strong style="color:var(--accent);" id="live-dps">0</strong></span>
+        </div>
+        <div class="deck-strip" id="live-deck"></div>
+      </div>
+
+      <!-- HEADLESS SIMULATOR & TELEMETRY -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span>Headless Batch Simulator (Instant Math Check)</span>
+          </div>
+          <div class="controls-row">
+            <button class="primary" id="btn-sim-60">Run 60s Sim (600 Ticks)</button>
+            <button id="btn-sim-300">Run 5m Sim (3,000 Ticks)</button>
+            <button id="btn-pin-baseline">Pin as Baseline A</button>
+          </div>
+          <div id="sim-report" style="font-size:13px;color:var(--muted);">
+            Run a batch sim to inspect DPS, damage source breakdown, and A/B deltas.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>0.1s Tick Event Log</span>
+            <button id="btn-clear-log" style="padding:3px 7px;font-size:11px;">Clear</button>
+          </div>
+          <div class="log-box" id="combat-log"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: BUILD ASSEMBLER ==================== -->
+    <section id="view-build" class="view-section">
+      <div class="grid-2">
+        <!-- CHASSIS & KEYSTONES -->
+        <div class="card">
+          <div class="card-header">
+            <span>1. Class Chassis &amp; Equipment</span>
+            <button class="primary" id="btn-save-preset">Save New Preset</button>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Class Archetype</label>
+              <select id="build-class-select">
+                <option value="templar">Templar (Melee / Caster / Tank)</option>
+                <option value="monk">Monk (Melee / Tank)</option>
+                <option value="elementalist">Elementalist (Caster)</option>
+                <option value="nightblade">Nightblade (Melee / Ranged)</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Main-Hand Weapon</label>
+              <select id="eq-weapon"></select>
+            </div>
+            <div class="form-field">
+              <label>Off-Hand / Shield / Focus</label>
+              <select id="eq-offhand"></select>
+            </div>
+            <div class="form-field">
+              <label>Chest Armor</label>
+              <select id="eq-armor"></select>
+            </div>
+            <div class="form-field">
+              <label>Ring</label>
+              <select id="eq-ring"></select>
+            </div>
+            <div class="form-field">
+              <label>Unique Relic</label>
+              <select id="eq-relic"></select>
+            </div>
+          </div>
+
+          <div class="card-header" style="margin-top:6px;">
+            <span>2. Rule-Breaking Keystones (Toggle Active)</span>
+          </div>
+          <div id="keystone-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+
+        <!-- 5-SLOT DECK & PASSIVE TRIGGERS -->
+        <div class="card">
+          <div class="card-header">
+            <span>3. 5-Slot Priority Deck, Conditions &amp; Runes</span>
+          </div>
+          <div id="deck-editor" style="display:flex;flex-direction:column;gap:8px;"></div>
+
+          <div class="card-header" style="margin-top:6px;">
+            <span>4. Passive Trigger Skills (Auto-Procs Equipped)</span>
+          </div>
+          <div id="passive-trigger-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+
+      <!-- COMPUTED STATS -->
+      <div class="card">
+        <div class="card-header"><span>Computed Character Sheet &amp; Tick Breakpoints</span></div>
+        <div class="stat-table" id="computed-stats-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: CODEX FORGE ==================== -->
+    <section id="view-codex" class="view-section">
+      <div class="grid-2">
+        <!-- CREATE / EDIT SKILL OR TRIGGER -->
+        <div class="card">
+          <div class="card-header"><span>Create Custom Skill or Trigger Proc</span></div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Skill Name</label>
+              <input id="fx-skill-name" placeholder="e.g. Hammer of Wrath" />
+            </div>
+            <div class="form-field">
+              <label>Class Tag</label>
+              <select id="fx-skill-class">
+                <option value="templar">Templar</option>
+                <option value="monk">Monk</option>
+                <option value="elementalist">Elementalist</option>
+                <option value="nightblade">Nightblade</option>
+                <option value="universal">Universal</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Execution Mode</label>
+              <select id="fx-skill-trigger">
+                <option value="ACTIVE">Active Deck Ability</option>
+                <option value="EVERY_N_ATTACK">Trigger: Every Nth Auto-Attack</option>
+                <option value="ON_HIT_TAKEN_STACKS">Trigger: At N Stacks (Hit Taken)</option>
+                <option value="ON_CRIT">Trigger: Every Nth Crit</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Trigger Threshold (N) / Cooldown (s)</label>
+              <input id="fx-skill-num" type="number" step="0.1" value="3" />
+            </div>
+            <div class="form-field">
+              <label>Damage Type</label>
+              <select id="fx-skill-dmgtype">
+                <option value="physical">Physical</option>
+                <option value="lightning">Lightning</option>
+                <option value="fire">Fire</option>
+                <option value="poison">Poison</option>
+                <option value="bleed">Bleed</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Targeting Mode</label>
+              <select id="fx-skill-target">
+                <option value="SINGLE">Single Target (100%)</option>
+                <option value="CLEAVE">Cleave (100% Main + 70% Adds)</option>
+                <option value="CHAIN">Chain Bounce (Up to 3, -25%/hit)</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Power Multiplier (%)</label>
+              <input id="fx-skill-mult" type="number" value="150" />
+            </div>
+            <div class="form-field">
+              <label>Resource Delta (-Cost or +Gain)</label>
+              <input id="fx-skill-res" type="number" value="0" />
+            </div>
+            <div class="form-field">
+              <label>Applies DoT? (6.0s)</label>
+              <select id="fx-skill-dot">
+                <option value="none">No DoT</option>
+                <option value="bleed">Apply Bleed DoT</option>
+                <option value="poison">Apply Poison DoT</option>
+                <option value="fire">Apply Burn DoT</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Stack Name (if Stack Trigger)</label>
+              <input id="fx-skill-stackname" placeholder="e.g. Reckoning" value="Reckoning" />
+            </div>
+          </div>
+          <button class="primary" id="btn-create-skill">Add / Update Skill in Codex</button>
+        </div>
+
+        <!-- CREATE / EDIT ITEM OR RELIC -->
+        <div class="card">
+          <div class="card-header"><span>Create Custom Item / Unique Relic</span></div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Item Name</label>
+              <input id="fx-item-name" placeholder="e.g. Aegis of Retribution" />
+            </div>
+            <div class="form-field">
+              <label>Equipment Slot</label>
+              <select id="fx-item-slot">
+                <option value="weapon">Main-Hand Weapon</option>
+                <option value="offhand">Off-Hand / Shield</option>
+                <option value="armor">Chest Armor</option>
+                <option value="ring">Ring</option>
+                <option value="relic">Unique Relic</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Flat Power / Weapon Dmg</label>
+              <input id="fx-item-power" type="number" value="20" />
+            </div>
+            <div class="form-field">
+              <label>Attack / Cast Speed (Haste %)</label>
+              <input id="fx-item-haste" type="number" value="10" />
+            </div>
+            <div class="form-field">
+              <label>Crit Chance %</label>
+              <input id="fx-item-crit" type="number" value="5" />
+            </div>
+            <div class="form-field">
+              <label>More Damage % (Multiplicative)</label>
+              <input id="fx-item-more" type="number" value="0" />
+            </div>
+            <div class="form-field">
+              <label>Convert 50% Damage</label>
+              <select id="fx-item-conv">
+                <option value="none">None</option>
+                <option value="physical:lightning">50% Physical &rarr; Lightning</option>
+                <option value="physical:fire">50% Physical &rarr; Fire</option>
+                <option value="physical:poison">50% Physical &rarr; Poison</option>
+                <option value="physical:bleed">50% Physical &rarr; Bleed</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Trigger Threshold Offset</label>
+              <select id="fx-item-offset">
+                <option value="0">None (0)</option>
+                <option value="-1">-1 Hit/Stack Required (Faster Procs)</option>
+                <option value="-2">-2 Hits/Stacks Required</option>
+              </select>
+            </div>
+          </div>
+          <button class="primary" id="btn-create-item">Add / Update Item in Codex</button>
+        </div>
+      </div>
+
+      <!-- CODEX BROWSER -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span>Codex: Skills &amp; Trigger Procs (<span id="codex-skill-count">0</span>)</span></div>
+          <div id="codex-skills-list" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span>Codex: Weapons, Armor &amp; Relics (<span id="codex-item-count">0</span>)</span></div>
+          <div id="codex-items-list" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: IMPORT / EXPORT ==================== -->
+    <section id="view-io" class="view-section">
+      <div class="card">
+        <div class="card-header">
+          <span>Modular JSON Pack Importer &amp; Exporter</span>
+          <div class="controls-row">
+            <button id="btn-export-all">Export Full Codex JSON</button>
+            <button class="danger" id="btn-factory-reset">Reset to Factory Defaults</button>
+          </div>
+        </div>
+        <p style="margin:0;color:var(--muted);font-size:13px;">
+          Paste any JSON pack (new classes, skills, triggers, items, runes, or presets) below.
+          <strong>Smart Merge</strong> adds or updates matching IDs without wiping your existing builds.
+        </p>
+        <textarea id="io-textarea" rows="12" placeholder='Paste JSON pack here, e.g. { "skills": [...], "items": [...] }'></textarea>
+        <div class="controls-row">
+          <button class="primary" id="btn-import-merge">Import &amp; Smart Merge</button>
+          <button id="btn-import-replace">Import &amp; Full Replace</button>
+          <span id="io-status" style="font-size:12px;color:var(--accent);"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // =========================================================================
+    // TICKFORGE — DATA-DRIVEN CODEX & 0.1s DETERMINISTIC SANDBOX ENGINE
+    // =========================================================================
+
+    const STORAGE_KEY = "tickforge_codex_v1";
+
+    const DEFAULT_CODEX = {
+      classes: {
+        templar: { id: "templar", name: "Templar", resName: "Zeal", baseHp: 1100, baseAutoTicks: 16, autoMult: 100, autoType: "physical" },
+        monk: { id: "monk", name: "Monk", resName: "Spirit", baseHp: 980, baseAutoTicks: 11, autoMult: 75, autoType: "physical" },
+        elementalist: { id: "elementalist", name: "Elementalist", resName: "Aether", baseHp: 820, baseAutoTicks: 14, autoMult: 85, autoType: "lightning" },
+        nightblade: { id: "nightblade", name: "Nightblade", resName: "Energy", baseHp: 880, baseAutoTicks: 10, autoMult: 70, autoType: "physical" }
+      },
+
+      skills: [
+        // --- TEMPLAR KIT ---
+        {
+          id: "shield_slam_proc", name: "Shield Slam (3rd Hit)", class: "templar",
+          trigger: { type: "EVERY_N_ATTACK", n: 3 },
+          damageType: "physical", targeting: { mode: "SINGLE" },
+          powerMult: 30, resDelta: 8, dotType: "none", cdTicks: 0, castTicks: 0
+        },
+        {
+          id: "hammer_of_wrath_proc", name: "Hammer of Wrath (10th Hit)", class: "templar",
+          trigger: { type: "EVERY_N_ATTACK", n: 10 },
+          damageType: "lightning", targeting: { mode: "SINGLE" },
+          powerMult: 260, resDelta: 15, dotType: "none", cdTicks: 0, castTicks: 0
+        },
+        {
+          id: "holy_avenger_proc", name: "Holy Avenger (10 Reckoning)", class: "templar",
+          trigger: { type: "ON_HIT_TAKEN_STACKS", stackName: "Reckoning", n: 10 },
+          damageType: "lightning", targeting: { mode: "CHAIN", maxTargets: 3, bounceDecay: 0.25 },
+          powerMult: 340, resDelta: 20, dotType: "none", cdTicks: 0, castTicks: 0
+        },
+        {
+          id: "solar_eruption", name: "Solar Eruption", class: "templar",
+          trigger: { type: "ACTIVE" },
+          damageType: "fire", targeting: { mode: "SINGLE" },
+          powerMult: 320, resDelta: -50, dotType: "none", cdTicks: 40, castTicks: 12
+        },
+        {
+          id: "consecrated_cleave", name: "Consecrated Cleave", class: "templar",
+          trigger: { type: "ACTIVE" },
+          damageType: "fire", targeting: { mode: "CLEAVE", splashPct: 0.75 },
+          powerMult: 165, resDelta: -30, dotType: "fire", cdTicks: 25, castTicks: 0
+        },
+        {
+          id: "judgment_strike", name: "Judgment Strike", class: "templar",
+          trigger: { type: "ACTIVE" },
+          damageType: "lightning", targeting: { mode: "SINGLE" },
+          powerMult: 115, resDelta: 20, dotType: "none", cdTicks: 0, castTicks: 0
+        },
+        {
+          id: "bastion_vow", name: "Bastion Vow", class: "templar",
+          trigger: { type: "ACTIVE" },
+          damageType: "physical", targeting: { mode: "SELF_BUFF" },
+          powerMult: 0, resDelta: 30, dotType: "none", cdTicks: 140, castTicks: 0
+        },
+
+        // --- MONK KIT ---
+        {
+          id: "thunder_palm_proc", name: "Thunder Palm (4th Hit)", class: "monk",
+          trigger: { type: "EVERY_N_ATTACK", n: 4 },
+          damageType: "lightning", targeting: { mode: "CLEAVE", splashPct: 0.65 },
+          powerMult: 135, resDelta: 12, dotType: "none", cdTicks: 0, castTicks: 0
+        },
+        {
+          id: "counter_cyclone_proc", name: "Counter Cyclone (6 Hits Taken)", class: "monk",
+          trigger: { type: "ON_HIT_TAKEN_STACKS", stackName: "Flow", n: 6 },
+          damageType: "physical", targeting: { mode: "CLEAVE", splashPct: 0.85 },
+          powerMult: 210, resDelta: 15, dotType: "none", cdTicks: 0, castTicks: 0
+        },
+        {
+          id: "storm_kick", name: "Tempest Kick", class: "monk",
+          trigger: { type: "ACTIVE" },
+          damageType: "lightning", targeting: { mode: "SINGLE" },
+          powerMult: 270, resDelta: -45, dotType: "none", cdTicks: 30, castTicks: 0
+        },
+        {
+          id: "palm_flurry", name: "Palm Flurry", class: "monk",
+          trigger: { type: "ACTIVE" },
+          damageType: "physical", targeting: { mode: "SINGLE" },
+          powerMult: 110, resDelta: 18, dotType: "none", cdTicks: 0, castTicks: 0
+        },
+
+        // --- ELEMENTALIST KIT ---
+        {
+          id: "overload_arc_proc", name: "Overload Arc (5th Attack)", class: "elementalist",
+          trigger: { type: "EVERY_N_ATTACK", n: 5 },
+          damageType: "lightning", targeting: { mode: "CHAIN", maxTargets: 3, bounceDecay: 0.2 },
+          powerMult: 220, resDelta: 15, dotType: "none", cdTicks: 0, castTicks: 0
+        },
+        {
+          id: "pyroblast", name: "Pyroblast", class: "elementalist",
+          trigger: { type: "ACTIVE" },
+          damageType: "fire", targeting: { mode: "SINGLE" },
+          powerMult: 360, resDelta: -50, dotType: "fire", cdTicks: 40, castTicks: 15
+        },
+        {
+          id: "chain_lightning", name: "Chain Lightning", class: "elementalist",
+          trigger: { type: "ACTIVE" },
+          damageType: "lightning", targeting: { mode: "CHAIN", maxTargets: 3, bounceDecay: 0.25 },
+          powerMult: 150, resDelta: -25, dotType: "none", cdTicks: 20, castTicks: 0
+        },
+        {
+          id: "spark_bolt", name: "Spark Bolt", class: "elementalist",
+          trigger: { type: "ACTIVE" },
+          damageType: "lightning", targeting: { mode: "SINGLE" },
+          powerMult: 105, resDelta: 22, dotType: "none", cdTicks: 0, castTicks: 0
+        },
+
+        // --- NIGHTBLADE KIT ---
+        {
+          id: "hemorrhage_proc", name: "Hemorrhage (5th Crit)", class: "nightblade",
+          trigger: { type: "ON_CRIT", n: 5 },
+          damageType: "bleed", targeting: { mode: "SINGLE" },
+          powerMult: 180, resDelta: 15, dotType: "bleed", cdTicks: 0, castTicks: 0
+        },
+        {
+          id: "venom_fang", name: "Venom Fang", class: "nightblade",
+          trigger: { type: "ACTIVE" },
+          damageType: "poison", targeting: { mode: "SINGLE" },
+          powerMult: 130, resDelta: -30, dotType: "poison", cdTicks: 20, castTicks: 0
+        },
+        {
+          id: "fan_of_knives", name: "Fan of Knives", class: "nightblade",
+          trigger: { type: "ACTIVE" },
+          damageType: "bleed", targeting: { mode: "CLEAVE", splashPct: 0.8 },
+          powerMult: 145, resDelta: -35, dotType: "bleed", cdTicks: 30, castTicks: 0
+        },
+        {
+          id: "viper_strike", name: "Viper Strike", class: "nightblade",
+          trigger: { type: "ACTIVE" },
+          damageType: "physical", targeting: { mode: "SINGLE" },
+          powerMult: 105, resDelta: 20, dotType: "none", cdTicks: 0, castTicks: 0
+        }
+      ],
+
+      items: [
+        { id: "mace_sanctified", name: "Sanctified War-Mace", slot: "weapon", mods: { power: 36, haste: 6, crit: 5, morePct: 0, conv: "none", triggerOffset: 0 } },
+        { id: "fist_storm", name: "Storm-Wrapped Handwraps", slot: "weapon", mods: { power: 28, haste: 16, crit: 10, morePct: 0, conv: "none", triggerOffset: 0 } },
+        { id: "staff_cinder", name: "Cinder-Core Aether Staff", slot: "weapon", mods: { power: 42, haste: 8, crit: 8, morePct: 0, conv: "none", triggerOffset: 0 } },
+        { id: "daggers_fang", name: "Twin Serrated Fangs", slot: "weapon", mods: { power: 26, haste: 18, crit: 16, morePct: 0, conv: "none", triggerOffset: 0 } },
+
+        { id: "shield_bulwark", name: "Bulwark Tower Shield", slot: "offhand", mods: { power: 10, haste: 0, crit: 0, morePct: 0, conv: "none", triggerOffset: 0, armor: 220, hp: 350 } },
+        { id: "shield_retribution", name: "Aegis of Retribution (Unique)", slot: "offhand", mods: { power: 16, haste: 6, crit: 4, morePct: 10, conv: "physical:lightning", triggerOffset: -1, armor: 260, hp: 400 } },
+        { id: "focus_aether", name: "Overcharged Prism", slot: "offhand", mods: { power: 22, haste: 12, crit: 8, morePct: 8, conv: "none", triggerOffset: 0, armor: 40, hp: 100 } },
+
+        { id: "armor_plate", name: "Forged Dreadplate", slot: "armor", mods: { power: 8, haste: 4, crit: 0, morePct: 0, conv: "none", triggerOffset: 0, armor: 300, hp: 450 } },
+        { id: "armor_brigandine", name: "Shadow-Stitched Leathers", slot: "armor", mods: { power: 12, haste: 12, crit: 8, morePct: 0, conv: "none", triggerOffset: 0, armor: 140, hp: 250 } },
+
+        { id: "ring_haste", name: "Chrono-Loop Signet", slot: "ring", mods: { power: 8, haste: 14, crit: 6, morePct: 0, conv: "none", triggerOffset: 0 } },
+        { id: "ring_venom", name: "Viper's Coil Band", slot: "ring", mods: { power: 10, haste: 8, crit: 10, morePct: 8, conv: "physical:poison", triggerOffset: 0 } },
+
+        { id: "relic_none", name: "No Relic Equipped", slot: "relic", mods: { power: 0, haste: 0, crit: 0, morePct: 0, conv: "none", triggerOffset: 0 } },
+        { id: "relic_cadence", name: "Heart of the Seventh Tick (Unique)", slot: "relic", mods: { power: 15, haste: 12, crit: 5, morePct: 15, conv: "none", triggerOffset: -1 } }
+      ],
+
+      runes: {
+        NONE: { id: "NONE", name: "Empty Socket", desc: "No modifier" },
+        CONCENTRATED: { id: "CONCENTRATED", name: "Concentrated Effect", desc: "+35% More Single-Target Dmg; disables Cleave/Chain" },
+        SPLASH: { id: "SPLASH", name: "Ancestral Splash", desc: "Adds 65% Cleave splash to Single-Target skills" },
+        CASCADE: { id: "CASCADE", name: "Spell Cascade", desc: "Triggers a 60% echo 0.3s later (+20% Resource Cost)" },
+        DEADLY_DOT: { id: "DEADLY_DOT", name: "Deadly Ailments", desc: "+45% More DoT damage, -25% Hit damage" }
+      },
+
+      keystones: [
+        { id: "ks_relentless", name: "Relentless Cadence", desc: "Every Nth Attack triggers require 1 fewer hit; Active skills deal 20% less damage." },
+        { id: "ks_chronostatic", name: "Chronostatic Rhythm", desc: "Locks GCD at 1.0s; excess Haste converts into +1% More Damage per 2% Haste." },
+        { id: "ks_crimson_dance", name: "Crimson Dance", desc: "Bleed and Poison DoTs tick 35% faster." }
+      ],
+
+      presets: {
+        templar_retaliation: {
+          name: "Templar: 1H Mace & Shield Reckoning",
+          classId: "templar",
+          equip: { weapon: "mace_sanctified", offhand: "shield_retribution", armor: "armor_plate", ring: "ring_haste", relic: "relic_none" },
+          keystones: ["ks_relentless"],
+          passives: ["shield_slam_proc", "hammer_of_wrath_proc", "holy_avenger_proc"],
+          deck: [
+            { skillId: "bastion_vow", cond: "ALWAYS", rune: "NONE" },
+            { skillId: "consecrated_cleave", cond: "ENEMIES_GE_2", rune: "NONE" },
+            { skillId: "solar_eruption", cond: "ENEMIES_EQ_1", rune: "CASCADE" },
+            { skillId: "judgment_strike", cond: "ALWAYS", rune: "SPLASH" },
+            { skillId: "judgment_strike", cond: "ALWAYS", rune: "NONE" }
+          ]
+        },
+        monk_tempest: {
+          name: "Monk: Thunder Palm & Cyclone",
+          classId: "monk",
+          equip: { weapon: "fist_storm", offhand: "focus_aether", armor: "armor_brigandine", ring: "ring_haste", relic: "relic_cadence" },
+          keystones: ["ks_relentless"],
+          passives: ["thunder_palm_proc", "counter_cyclone_proc"],
+          deck: [
+            { skillId: "storm_kick", cond: "RES_GE_50", rune: "CONCENTRATED" },
+            { skillId: "palm_flurry", cond: "ALWAYS", rune: "SPLASH" },
+            { skillId: "palm_flurry", cond: "ALWAYS", rune: "NONE" },
+            { skillId: "palm_flurry", cond: "ALWAYS", rune: "NONE" },
+            { skillId: "palm_flurry", cond: "ALWAYS", rune: "NONE" }
+          ]
+        },
+        elementalist_overload: {
+          name: "Elementalist: Arc & Pyroblast",
+          classId: "elementalist",
+          equip: { weapon: "staff_cinder", offhand: "focus_aether", armor: "armor_brigandine", ring: "ring_haste", relic: "relic_none" },
+          keystones: [],
+          passives: ["overload_arc_proc"],
+          deck: [
+            { skillId: "pyroblast", cond: "ENEMIES_EQ_1", rune: "CASCADE" },
+            { skillId: "chain_lightning", cond: "ENEMIES_GE_2", rune: "NONE" },
+            { skillId: "spark_bolt", cond: "ALWAYS", rune: "NONE" },
+            { skillId: "spark_bolt", cond: "ALWAYS", rune: "NONE" },
+            { skillId: "spark_bolt", cond: "ALWAYS", rune: "NONE" }
+          ]
+        },
+        nightblade_venom: {
+          name: "Nightblade: Crit Bleed & Poison",
+          classId: "nightblade",
+          equip: { weapon: "daggers_fang", offhand: "focus_aether", armor: "armor_brigandine", ring: "ring_venom", relic: "relic_none" },
+          keystones: ["ks_crimson_dance"],
+          passives: ["hemorrhage_proc"],
+          deck: [
+            { skillId: "fan_of_knives", cond: "ENEMIES_GE_2", rune: "DEADLY_DOT" },
+            { skillId: "venom_fang", cond: "ALWAYS", rune: "DEADLY_DOT" },
+            { skillId: "viper_strike", cond: "ALWAYS", rune: "NONE" },
+            { skillId: "viper_strike", cond: "ALWAYS", rune: "NONE" },
+            { skillId: "viper_strike", cond: "ALWAYS", rune: "NONE" }
+          ]
+        }
+      }
+    };
+
+    function loadCodex() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return JSON.parse(JSON.stringify(DEFAULT_CODEX));
+        return JSON.parse(raw);
+      } catch {
+        return JSON.parse(JSON.stringify(DEFAULT_CODEX));
+      }
+    }
+
+    function saveCodex() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(codex));
+    }
+
+    let codex = loadCodex();
+
+    // =========================================================================
+    // RUNTIME STATE
+    // =========================================================================
+    const sim = {
+      speed: 1,
+      paused: false,
+      encounterType: "trash",
+      activePresetKey: "templar_retaliation",
+      build: JSON.parse(JSON.stringify(codex.presets.templar_retaliation)),
+      tick: 0,
+      kills: 0,
+      baselineReport: null,
+
+      hero: {
+        hp: 1000,
+        maxHp: 1000,
+        res: 0,
+        gcdRem: 0,
+        castRem: 0,
+        castTotal: 0,
+        currentCast: null,
+        autoRem: 15,
+        buffTicks: 0,
+        autoCounter: 0,
+        critCounter: 0,
+        hitTakenStacks: {}
+      },
+
+      enemies: [],
+      delayed: [],
+      cds: [0, 0, 0, 0, 0],
+      dmgLog: [],
+      logs: []
+    };
+
+    function getSkill(id) {
+      return codex.skills.find((s) => s.id === id) || codex.skills[0];
+    }
+
+    function getItem(id) {
+      return codex.items.find((i) => i.id === id) || { name: "None", mods: { power: 0, haste: 0, crit: 0, morePct: 0, conv: "none", triggerOffset: 0, armor: 0, hp: 0 } };
+    }
+
+    function computeStats(buildObj = sim.build, heroObj = sim.hero) {
+      const cls = codex.classes[buildObj.classId] || codex.classes.templar;
+      const items = Object.values(buildObj.equip).map(getItem);
+      const ks = new Set(buildObj.keystones || []);
+
+      let power = 30 + items.reduce((s, i) => s + (i.mods.power || 0), 0);
+      let haste = items.reduce((s, i) => s + (i.mods.haste || 0), 0) + (heroObj.buffTicks > 0 ? 25 : 0);
+      let crit = Math.min(95, 10 + items.reduce((s, i) => s + (i.mods.crit || 0), 0));
+      let armor = items.reduce((s, i) => s + (i.mods.armor || 0), 0);
+      let maxHp = cls.baseHp + items.reduce((s, i) => s + (i.mods.hp || 0), 0);
+      let triggerOffset = items.reduce((s, i) => s + (i.mods.triggerOffset || 0), 0) + (ks.has("ks_relentless") ? -1 : 0);
+
+      let moreMult = 1.0;
+      items.forEach((i) => {
+        if (i.mods.morePct) moreMult *= (1 + i.mods.morePct / 100);
+      });
+
+      let gcdTicks = Math.max(7, Math.round(15 / (1 + haste / 100)));
+      if (ks.has("ks_chronostatic")) {
+        gcdTicks = 10;
+        moreMult *= (1 + (haste * 0.5) / 100);
+      }
+
+      const autoTicks = Math.max(4, Math.round(cls.baseAutoTicks / (1 + haste / 100)));
+      const conversions = items.map((i) => i.mods.conv).filter((c) => c && c !== "none");
+
+      return { cls, power, haste, crit, armor, maxHp, triggerOffset, moreMult, gcdTicks, autoTicks, conversions, ks };
+    }
+
+    function spawnEncounter(type = sim.encounterType) {
+      const makeEnemy = (name, rank, hp, dmg, atkTicks) => ({
+        id: Math.random(),
+        name, rank, hp, maxHp: hp, dmg, atkTicks, atkRem: atkTicks,
+        dots: [] // { type, dpsTick, remTicks }
+      });
+
+      if (type === "trash") {
+        sim.enemies = [
+          makeEnemy("Fallfield Stalker", "Trash", 420, 22, 18),
+          makeEnemy("Blighted Skitterer", "Trash", 280, 14, 15),
+          makeEnemy("Blighted Skitterer", "Trash", 280, 14, 17)
+        ];
+      } else if (type === "elite") {
+        sim.enemies = [
+          makeEnemy("Ashen Dreadguard", "Elite", 1950, 52, 20),
+          makeEnemy("Cinder Acolyte", "Trash", 650, 24, 16)
+        ];
+      } else {
+        sim.enemies = [
+          makeEnemy("Warden Morvath", "Boss", 7200, 88, 15)
+        ];
+      }
+    }
+
+    function resetSimulation(keepBaseline = true) {
+      const st = computeStats();
+      sim.tick = 0;
+      sim.kills = 0;
+      sim.hero.maxHp = st.maxHp;
+      sim.hero.hp = st.maxHp;
+      sim.hero.res = 0;
+      sim.hero.gcdRem = 0;
+      sim.hero.castRem = 0;
+      sim.hero.currentCast = null;
+      sim.hero.autoRem = st.autoTicks;
+      sim.hero.buffTicks = 0;
+      sim.hero.autoCounter = 0;
+      sim.hero.critCounter = 0;
+      sim.hero.hitTakenStacks = {};
+      sim.cds = [0, 0, 0, 0, 0];
+      sim.delayed = [];
+      sim.dmgLog = [];
+      sim.logs = [];
+      if (!keepBaseline) sim.baselineReport = null;
+      spawnEncounter();
+    }
+
+    function logEvent(msg, clsName = "") {
+      const t = (sim.tick / 10).toFixed(1);
+      sim.logs.unshift(`<div class="${clsName}"><span style="color:var(--muted)">[${t}s]</span> ${msg}</div>`);
+      if (sim.logs.length > 50) sim.logs.pop();
+    }
+
+    function checkCondition(cond) {
+      if (cond === "ALWAYS") return true;
+      if (cond === "ENEMIES_GE_2") return sim.enemies.length >= 2;
+      if (cond === "ENEMIES_EQ_1") return sim.enemies.length === 1;
+      if (cond === "RES_GE_50") return sim.hero.res >= 50;
+      if (cond === "TARGET_BOSS") return sim.enemies[0] && (sim.enemies[0].rank === "Boss" || sim.enemies[0].rank === "Elite");
+      return true;
+    }
+
+    function applyDamage(targetIdx, rawDmg, baseType, sourceCat, label, stats, isCrit = false, dotType = "none") {
+      const target = sim.enemies[targetIdx];
+      if (!target) return;
+
+      // Handle 50% damage conversion if equipped
+      let finalType = baseType;
+      for (const conv of stats.conversions) {
+        const [from, to] = conv.split(":");
+        if (from === baseType) finalType = to;
+      }
+
+      const dmg = Math.max(1, Math.round(rawDmg));
+      target.hp = Math.max(0, target.hp - dmg);
+      sim.dmgLog.push({ tick: sim.tick, dmg, source: sourceCat, type: finalType });
+
+      if (dotType !== "none") {
+        const dotPerTick = dmg * 0.22;
+        target.dots.push({ type: dotType, dmgPerTick: dotPerTick, remTicks: 60 });
+      }
+
+      if (sim.logs.length < 50 && sourceCat !== "dot") {
+        logEvent(`${label} hits ${target.name} for <strong>${dmg}</strong>${isCrit ? "!" : ""} (${finalType})`, `dmg-${finalType}`);
+      }
+    }
+
+    function fireSkillPayload(skill, runeId, sourceCat, stats) {
+      if (skill.targeting.mode === "SELF_BUFF") {
+        sim.hero.buffTicks = 60;
+        logEvent(`${skill.name} activated (+25% Haste for 6.0s)`, "dmg-lightning");
+        return;
+      }
+
+      const isCrit = Math.random() * 100 < stats.crit;
+      if (isCrit) {
+        sim.hero.critCounter++;
+        checkCritTriggers(stats);
+      }
+
+      let mult = (skill.powerMult / 100) * stats.moreMult * (isCrit ? 1.75 : 1.0);
+      if (sourceCat === "active" && stats.ks.has("ks_relentless")) mult *= 0.8;
+      if (runeId === "CONCENTRATED") mult *= 1.35;
+      if (runeId === "DEADLY_DOT") mult *= 0.75;
+
+      const baseHit = stats.power * mult;
+      const mode = runeId === "CONCENTRATED" ? "SINGLE" : (runeId === "SPLASH" && skill.targeting.mode === "SINGLE" ? "CLEAVE" : skill.targeting.mode);
+
+      if (mode === "SINGLE") {
+        applyDamage(0, baseHit, skill.damageType, sourceCat, skill.name, stats, isCrit, skill.dotType);
+      } else if (mode === "CLEAVE") {
+        const splash = skill.targeting.splashPct || 0.65;
+        sim.enemies.forEach((_, idx) => {
+          const factor = idx === 0 ? 1.0 : splash;
+          applyDamage(idx, baseHit * factor, skill.damageType, sourceCat, skill.name, stats, isCrit, idx === 0 ? skill.dotType : "none");
+        });
+      } else if (mode === "CHAIN") {
+        const maxT = Math.min(sim.enemies.length, skill.targeting.maxTargets || 3);
+        const decay = skill.targeting.bounceDecay || 0.25;
+        for (let i = 0; i < maxT; i++) {
+          const factor = Math.pow(1 - decay, i);
+          applyDamage(i, baseHit * factor, skill.damageType, sourceCat, `${skill.name} [Bounce ${i + 1}]`, stats, isCrit, i === 0 ? skill.dotType : "none");
+        }
+      }
+
+      if (runeId === "CASCADE") {
+        sim.delayed.push({ execTick: sim.tick + 3, skill, baseHit: baseHit * 0.6, sourceCat });
+      }
+    }
+
+    function checkAttackTriggers(stats) {
+      for (const pid of sim.build.passives) {
+        const sk = getSkill(pid);
+        if (sk.trigger.type === "EVERY_N_ATTACK") {
+          const req = Math.max(1, (sk.trigger.n || 3) + stats.triggerOffset);
+          if (sim.hero.autoCounter % req === 0) {
+            sim.hero.res = Math.min(100, Math.max(0, sim.hero.res + (sk.resDelta || 0)));
+            fireSkillPayload(sk, "NONE", "proc", stats);
+          }
+        }
+      }
+    }
+
+    function checkCritTriggers(stats) {
+      for (const pid of sim.build.passives) {
+        const sk = getSkill(pid);
+        if (sk.trigger.type === "ON_CRIT") {
+          const req = Math.max(1, (sk.trigger.n || 5) + stats.triggerOffset);
+          if (sim.hero.critCounter % req === 0) {
+            sim.hero.res = Math.min(100, Math.max(0, sim.hero.res + (sk.resDelta || 0)));
+            fireSkillPayload(sk, "NONE", "proc", stats);
+          }
+        }
+      }
+    }
+
+    function checkHitTakenTriggers(stats) {
+      for (const pid of sim.build.passives) {
+        const sk = getSkill(pid);
+        if (sk.trigger.type === "ON_HIT_TAKEN_STACKS") {
+          const sName = sk.trigger.stackName || "Reckoning";
+          const req = Math.max(1, (sk.trigger.n || 10) + stats.triggerOffset);
+          sim.hero.hitTakenStacks[sName] = (sim.hero.hitTakenStacks[sName] || 0) + 1;
+          if (sim.hero.hitTakenStacks[sName] >= req) {
+            sim.hero.hitTakenStacks[sName] = 0;
+            sim.hero.res = Math.min(100, Math.max(0, sim.hero.res + (sk.resDelta || 0)));
+            fireSkillPayload(sk, "NONE", "proc", stats);
+          }
+        }
+      }
+    }
+
+    function stepTick() {
+      sim.tick++;
+      const stats = computeStats();
+      sim.hero.maxHp = stats.maxHp;
+
+      // Passive 2.5% HP regen/sec
+      if (sim.tick % 10 === 0) {
+        sim.hero.hp = Math.min(sim.hero.maxHp, sim.hero.hp + Math.round(sim.hero.maxHp * 0.025));
+      }
+
+      if (sim.hero.gcdRem > 0) sim.hero.gcdRem--;
+      if (sim.hero.castRem > 0) sim.hero.castRem--;
+      if (sim.hero.autoRem > 0) sim.hero.autoRem--;
+      if (sim.hero.buffTicks > 0) sim.hero.buffTicks--;
+      for (let i = 0; i < 5; i++) if (sim.cds[i] > 0) sim.cds[i]--;
+
+      // Delayed Cascade echoes
+      sim.delayed = sim.delayed.filter((ev) => {
+        if (ev.execTick <= sim.tick) {
+          applyDamage(0, ev.baseHit, ev.skill.damageType, ev.sourceCat, `${ev.skill.name} (Cascade)`, stats, false, "none");
+          return false;
+        }
+        return true;
+      });
+
+      // Finish cast bar
+      if (sim.hero.currentCast && sim.hero.castRem === 0) {
+        fireSkillPayload(sim.hero.currentCast.skill, sim.hero.currentCast.rune, "active", stats);
+        sim.hero.currentCast = null;
+      }
+
+      // Evaluate 5-Slot Priority Deck
+      if (!sim.hero.currentCast && sim.hero.gcdRem === 0 && sim.enemies.length > 0) {
+        for (let i = 0; i < 5; i++) {
+          const slot = sim.build.deck[i];
+          const sk = getSkill(slot.skillId);
+          const cost = sk.resDelta < 0 ? Math.abs(sk.resDelta) * (slot.rune === "CASCADE" ? 1.2 : 1) : 0;
+
+          if (sim.cds[i] === 0 && sim.hero.res >= cost && checkCondition(slot.cond)) {
+            sim.hero.res = Math.min(100, Math.max(0, sim.hero.res - cost + (sk.resDelta > 0 ? sk.resDelta : 0)));
+            sim.cds[i] = sk.cdTicks || 0;
+            sim.hero.gcdRem = stats.gcdTicks;
+
+            if (sk.castTicks > 0) {
+              const effCast = Math.max(1, Math.round(sk.castTicks / (1 + stats.haste / 100)));
+              sim.hero.castRem = effCast;
+              sim.hero.castTotal = effCast;
+              sim.hero.currentCast = { skill: sk, rune: slot.rune };
+            } else {
+              fireSkillPayload(sk, slot.rune, "active", stats);
+            }
+            break;
+          }
+        }
+      }
+
+      // Auto-Attack Loop
+      if (sim.hero.autoRem === 0 && !sim.hero.currentCast && sim.enemies.length > 0) {
+        sim.hero.autoRem = stats.autoTicks;
+        sim.hero.autoCounter++;
+        const isCrit = Math.random() * 100 < stats.crit;
+        if (isCrit) {
+          sim.hero.critCounter++;
+          checkCritTriggers(stats);
+        }
+        const autoDmg = stats.power * (stats.cls.autoMult / 100) * stats.moreMult * (isCrit ? 1.75 : 1);
+        applyDamage(0, autoDmg, stats.cls.autoType, "auto", "Auto-Attack", stats, isCrit, "none");
+        checkAttackTriggers(stats);
+      }
+
+      // Process Enemy DoTs & Attacks
+      const dotInterval = stats.ks.has("ks_crimson_dance") ? 3 : 5;
+      sim.enemies.forEach((en, idx) => {
+        en.dots.forEach((d) => {
+          if (d.remTicks % dotInterval === 0) {
+            const dotMult = sim.build.deck.some((s) => s.rune === "DEADLY_DOT") ? 1.45 : 1.0;
+            applyDamage(idx, d.dmgPerTick * dotMult, d.type, "dot", `${d.type} DoT`, stats, false, "none");
+          }
+          d.remTicks--;
+        });
+        en.dots = en.dots.filter((d) => d.remTicks > 0);
+
+        en.atkRem--;
+        if (en.atkRem <= 0) {
+          en.atkRem = en.atkTicks;
+          const mit = 1 - Math.min(0.65, stats.armor / (stats.armor + 600));
+          const taken = Math.max(1, Math.round(en.dmg * mit));
+          sim.hero.hp = Math.max(1, sim.hero.hp - taken);
+          checkHitTakenTriggers(stats);
+        }
+      });
+
+      // Clean dead enemies & respawn wave
+      const before = sim.enemies.length;
+      sim.enemies = sim.enemies.filter((e) => e.hp > 0);
+      if (sim.enemies.length < before) {
+        sim.kills += (before - sim.enemies.length);
+      }
+      if (sim.enemies.length === 0) {
+        spawnEncounter();
+      }
+    }
+
+    // =========================================================================
+    // HEADLESS BATCH SIMULATOR
+    // =========================================================================
+    function runHeadlessBatch(totalTicks) {
+      const saved = JSON.parse(JSON.stringify({
+        tick: sim.tick, kills: sim.kills, hero: sim.hero, enemies: sim.enemies,
+        delayed: sim.delayed, cds: sim.cds, dmgLog: sim.dmgLog, logs: sim.logs
+      }));
+
+      resetSimulation(true);
+      for (let t = 0; t < totalTicks; t++) {
+        stepTick();
+      }
+
+      const totalDmg = sim.dmgLog.reduce((s, x) => s + x.dmg, 0);
+      const seconds = totalTicks / 10;
+      const dps = Math.round(totalDmg / seconds);
+
+      const bySource = { auto: 0, proc: 0, active: 0, dot: 0 };
+      const byType = { physical: 0, lightning: 0, fire: 0, poison: 0, bleed: 0 };
+      sim.dmgLog.forEach((x) => {
+        bySource[x.source] = (bySource[x.source] || 0) + x.dmg;
+        byType[x.type] = (byType[x.type] || 0) + x.dmg;
+      });
+
+      const report = { dps, totalDmg, seconds, kills: sim.kills, bySource, byType, gcd: (computeStats().gcdTicks / 10).toFixed(1) };
+
+      // Restore live fight state
+      Object.assign(sim, saved);
+      renderBatchReport(report);
+    }
+
+    function renderBatchReport(r) {
+      window._lastBatchReport = r;
+      const pct = (v) => r.totalDmg > 0 ? Math.round((v / r.totalDmg) * 100) : 0;
+      let deltaHtml = "";
+      if (sim.baselineReport) {
+        const diff = r.dps - sim.baselineReport.dps;
+        const diffPct = sim.baselineReport.dps > 0 ? ((diff / sim.baselineReport.dps) * 100).toFixed(1) : "0.0";
+        const sign = diff >= 0 ? "+" : "";
+        const col = diff >= 0 ? "#22c55e" : "#ef4444";
+        deltaHtml = `<div style="margin-top:6px;padding:6px 8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;">
+          vs. Baseline A (${sim.baselineReport.dps.toLocaleString()} DPS): <strong style="color:${col}">${sign}${diff.toLocaleString()} DPS (${sign}${diffPct}%)</strong>
+        </div>`;
+      }
+
+      document.getElementById("sim-report").innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+          <span style="font-size:18px;font-weight:800;color:var(--accent);" class="num">${r.dps.toLocaleString()} DPS</span>
+          <span class="num">${r.seconds}s • ${r.kills} Kills • GCD ${r.gcd}s</span>
+        </div>
+        <div class="chip-row" style="margin-bottom:6px;">
+          <span class="chip">Auto-Atk: <strong>${pct(r.bySource.auto)}%</strong></span>
+          <span class="chip">Trigger Procs: <strong>${pct(r.bySource.proc)}%</strong></span>
+          <span class="chip">Active Skills: <strong>${pct(r.bySource.active)}%</strong></span>
+          <span class="chip">DoTs: <strong>${pct(r.bySource.dot)}%</strong></span>
+        </div>
+        <div class="chip-row">
+          <span class="chip dmg-physical">Phys ${pct(r.byType.physical)}%</span>
+          <span class="chip dmg-lightning">Light ${pct(r.byType.lightning)}%</span>
+          <span class="chip dmg-fire">Fire ${pct(r.byType.fire)}%</span>
+          <span class="chip dmg-poison">Poison ${pct(r.byType.poison)}%</span>
+          <span class="chip dmg-bleed">Bleed ${pct(r.byType.bleed)}%</span>
+        </div>
+        ${deltaHtml}
+      `;
+    }
+
+    // =========================================================================
+    // UI RENDERING
+    // =========================================================================
+    function renderCombatUI() {
+      const stats = computeStats();
+      document.getElementById("hero-header-label").textContent = `${stats.cls.name} — ${getItem(sim.build.equip.weapon).name}`;
+      document.getElementById("sim-clock").textContent = `${(sim.tick / 10).toFixed(1)}s`;
+      document.getElementById("hero-hp-text").textContent = `${sim.hero.hp} / ${sim.hero.maxHp}`;
+      document.getElementById("hero-hp-bar").style.width = `${(sim.hero.hp / sim.hero.maxHp) * 100}%`;
+
+      document.getElementById("hero-res-label").textContent = stats.cls.resName;
+      document.getElementById("hero-res-text").textContent = `${Math.round(sim.hero.res)} / 100`;
+      document.getElementById("hero-res-bar").style.width = `${sim.hero.res}%`;
+
+      document.getElementById("gcd-status").textContent = `GCD: ${(stats.gcdTicks / 10).toFixed(1)}s`;
+      if (sim.hero.currentCast) {
+        const pct = ((sim.hero.castTotal - sim.hero.castRem) / sim.hero.castTotal) * 100;
+        document.getElementById("cast-status").textContent = `Casting: ${sim.hero.currentCast.skill.name}`;
+        document.getElementById("cast-bar").style.width = `${pct}%`;
+      } else {
+        document.getElementById("cast-status").textContent = sim.hero.gcdRem > 0 ? "Global Cooldown" : "Auto-Attacking / Scanning Deck";
+        document.getElementById("cast-bar").style.width = "0%";
+      }
+
+      // Counters & Stacks chips
+      const chips = [`<span class="chip num">Auto Hits: <strong>${sim.hero.autoCounter}</strong></span>`];
+      Object.entries(sim.hero.hitTakenStacks).forEach(([k, v]) => {
+        chips.push(`<span class="chip num">${k}: <strong>${v}</strong></span>`);
+      });
+      if (sim.hero.buffTicks > 0) {
+        chips.push(`<span class="chip dmg-lightning num">+25% Haste (${(sim.hero.buffTicks / 10).toFixed(1)}s)</span>`);
+      }
+      document.getElementById("hero-counters").innerHTML = chips.join("");
+
+      // Enemies
+      document.getElementById("kill-count").textContent = sim.kills;
+      document.getElementById("enemy-list").innerHTML = sim.enemies.map((en, idx) => `
+        <div class="enemy-item ${idx === 0 ? "primary-target" : ""}">
+          <div class="row-between">
+            <span><strong>${en.name}</strong> <span class="badge-pill">${en.rank}</span></span>
+            <span class="num">${en.hp} / ${en.maxHp} HP</span>
+          </div>
+          <div class="bar-wrap"><div class="bar-fill" style="background:#ef4444;width:${(en.hp / en.maxHp) * 100}%;"></div></div>
+          <div style="font-size:11px;color:var(--muted);" class="num">
+            Next Attack: ${(en.atkRem / 10).toFixed(1)}s • Active DoTs: ${en.dots.length}
+          </div>
+        </div>
+      `).join("");
+
+      // 5-Slot Deck
+      document.getElementById("live-deck").innerHTML = sim.build.deck.map((slot, i) => {
+        const sk = getSkill(slot.skillId);
+        const cd = sim.cds[i];
+        return `
+          <div class="deck-slot ${cd === 0 ? "ready" : ""}">
+            <div class="row-between">
+              <span style="font-size:11px;color:var(--muted);">#${i + 1}</span>
+              <span class="num" style="font-size:11px;color:${cd > 0 ? "var(--accent)" : "#22c55e"};">
+                ${cd > 0 ? `${(cd / 10).toFixed(1)}s` : "READY"}
+              </span>
+            </div>
+            <strong class="dmg-${sk.damageType}" style="font-size:12px;">${sk.name}</strong>
+            <span style="font-size:11px;color:var(--muted);">${slot.cond}</span>
+            <span style="font-size:11px;color:var(--light);">${codex.runes[slot.rune]?.name || ""}</span>
+          </div>
+        `;
+      }).join("");
+
+      // Rolling 15s DPS
+      const recent = sim.dmgLog.filter((d) => sim.tick - d.tick <= 150);
+      const winSec = Math.min(15, Math.max(1, sim.tick / 10));
+      const dps = Math.round(recent.reduce((s, x) => s + x.dmg, 0) / winSec);
+      document.getElementById("live-dps").textContent = dps.toLocaleString();
+
+      document.getElementById("combat-log").innerHTML = sim.logs.join("");
+    }
+
+    function renderBuildEditor() {
+      // Preset dropdown
+      const pSel = document.getElementById("preset-select");
+      pSel.innerHTML = Object.entries(codex.presets).map(([k, p]) =>
+        `<option value="${k}" ${k === sim.activePresetKey ? "selected" : ""}>${p.name}</option>`
+      ).join("");
+
+      document.getElementById("build-class-select").value = sim.build.classId;
+
+      // Equipment dropdowns
+      const fillSlot = (elId, slotName) => {
+        const el = document.getElementById(elId);
+        const items = codex.items.filter((i) => i.slot === slotName);
+        el.innerHTML = items.map((i) => `<option value="${i.id}" ${sim.build.equip[slotName] === i.id ? "selected" : ""}>${i.name}</option>`).join("");
+      };
+      fillSlot("eq-weapon", "weapon");
+      fillSlot("eq-offhand", "offhand");
+      fillSlot("eq-armor", "armor");
+      fillSlot("eq-ring", "ring");
+      fillSlot("eq-relic", "relic");
+
+      // Keystones
+      document.getElementById("keystone-list").innerHTML = codex.keystones.map((ks) => {
+        const active = (sim.build.keystones || []).includes(ks.id);
+        return `
+          <div class="list-item">
+            <div>
+              <strong>${ks.name}</strong>
+              <div style="font-size:12px;color:var(--muted);">${ks.desc}</div>
+            </div>
+            <button class="${active ? "active" : ""}" data-toggle-ks="${ks.id}">${active ? "Equipped" : "Equip"}</button>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-toggle-ks]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.toggleKs;
+          const idx = sim.build.keystones.indexOf(id);
+          if (idx >= 0) sim.build.keystones.splice(idx, 1);
+          else sim.build.keystones.push(id);
+          renderBuildEditor();
+        });
+      });
+
+      // 5-Slot Deck Editor
+      const activeSkills = codex.skills.filter((s) => s.trigger.type === "ACTIVE");
+      document.getElementById("deck-editor").innerHTML = sim.build.deck.map((slot, idx) => `
+        <div class="list-item" style="flex-wrap:wrap;">
+          <strong>Slot #${idx + 1}</strong>
+          <select data-deck-skill="${idx}">
+            ${activeSkills.map((s) => `<option value="${s.id}" ${slot.skillId === s.id ? "selected" : ""}>${s.name} (${s.class})</option>`).join("")}
+          </select>
+          <select data-deck-cond="${idx}">
+            <option value="ALWAYS" ${slot.cond === "ALWAYS" ? "selected" : ""}>IF: Always Ready</option>
+            <option value="ENEMIES_GE_2" ${slot.cond === "ENEMIES_GE_2" ? "selected" : ""}>IF: Enemies &ge; 2</option>
+            <option value="ENEMIES_EQ_1" ${slot.cond === "ENEMIES_EQ_1" ? "selected" : ""}>IF: Solo Target (1)</option>
+            <option value="RES_GE_50" ${slot.cond === "RES_GE_50" ? "selected" : ""}>IF: Resource &ge; 50</option>
+            <option value="TARGET_BOSS" ${slot.cond === "TARGET_BOSS" ? "selected" : ""}>IF: Elite or Boss</option>
+          </select>
+          <select data-deck-rune="${idx}">
+            ${Object.values(codex.runes).map((r) => `<option value="${r.id}" ${slot.rune === r.id ? "selected" : ""}>Rune: ${r.name}</option>`).join("")}
+          </select>
+        </div>
+      `).join("");
+
+      document.querySelectorAll("[data-deck-skill]").forEach((el) => el.addEventListener("change", () => {
+        sim.build.deck[Number(el.dataset.deckSkill)].skillId = el.value;
+      }));
+      document.querySelectorAll("[data-deck-cond]").forEach((el) => el.addEventListener("change", () => {
+        sim.build.deck[Number(el.dataset.deckCond)].cond = el.value;
+      }));
+      document.querySelectorAll("[data-deck-rune]").forEach((el) => el.addEventListener("change", () => {
+        sim.build.deck[Number(el.dataset.deckRune)].rune = el.value;
+      }));
+
+      // Passive Trigger Skills
+      const triggerSkills = codex.skills.filter((s) => s.trigger.type !== "ACTIVE");
+      document.getElementById("passive-trigger-list").innerHTML = triggerSkills.map((sk) => {
+        const equipped = sim.build.passives.includes(sk.id);
+        return `
+          <div class="list-item">
+            <div>
+              <strong class="dmg-${sk.damageType}">${sk.name}</strong>
+              <div style="font-size:12px;color:var(--muted);">${sk.trigger.type} (N=${sk.trigger.n}) • ${sk.powerMult}% Power • ${sk.targeting.mode}</div>
+            </div>
+            <button class="${equipped ? "active" : ""}" data-toggle-passive="${sk.id}">${equipped ? "Active" : "Enable"}</button>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-toggle-passive]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.togglePassive;
+          const idx = sim.build.passives.indexOf(id);
+          if (idx >= 0) sim.build.passives.splice(idx, 1);
+          else sim.build.passives.push(id);
+          renderBuildEditor();
+        });
+      });
+
+      // Computed Stats Grid
+      const st = computeStats();
+      document.getElementById("computed-stats-grid").innerHTML = `
+        <div class="stat-cell"><span>Base Power</span><strong class="num">${st.power}</strong></div>
+        <div class="stat-cell"><span>Haste %</span><strong class="num">${st.haste}%</strong></div>
+        <div class="stat-cell"><span>Effective GCD</span><strong class="num">${(st.gcdTicks / 10).toFixed(1)}s</strong></div>
+        <div class="stat-cell"><span>Auto-Attack Interval</span><strong class="num">${(st.autoTicks / 10).toFixed(1)}s</strong></div>
+        <div class="stat-cell"><span>Crit Chance</span><strong class="num">${st.crit}%</strong></div>
+        <div class="stat-cell"><span>Trigger Threshold Offset</span><strong class="num">${st.triggerOffset}</strong></div>
+        <div class="stat-cell"><span>Global More Multiplier</span><strong class="num">${st.moreMult.toFixed(2)}x</strong></div>
+        <div class="stat-cell"><span>Max Life / Armor</span><strong class="num">${st.maxHp} / ${st.armor}</strong></div>
+      `;
+    }
+
+    function renderCodexBrowser() {
+      document.getElementById("codex-skill-count").textContent = codex.skills.length;
+      document.getElementById("codex-skills-list").innerHTML = codex.skills.map((s) => `
+        <div class="list-item">
+          <div>
+            <strong class="dmg-${s.damageType}">${s.name}</strong> <span class="badge-pill">${s.class}</span>
+            <div style="font-size:11px;color:var(--muted);">${s.trigger.type} • ${s.powerMult}% • ${s.targeting.mode}</div>
+          </div>
+          <span class="badge-pill">${s.id}</span>
+        </div>
+      `).join("");
+
+      document.getElementById("codex-item-count").textContent = codex.items.length;
+      document.getElementById("codex-items-list").innerHTML = codex.items.map((i) => `
+        <div class="list-item">
+          <div>
+            <strong>${i.name}</strong> <span class="badge-pill">${i.slot}</span>
+            <div style="font-size:11px;color:var(--muted);">+${i.mods.power || 0} Pwr • +${i.mods.haste || 0}% Haste • +${i.mods.morePct || 0}% More</div>
+          </div>
+          <span class="badge-pill">${i.id}</span>
+        </div>
+      `).join("");
+    }
+
+    // =========================================================================
+    // EVENT LISTENERS
+    // =========================================================================
+    document.querySelectorAll(".nav-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".nav-tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        const v = tab.dataset.view;
+        document.querySelectorAll(".view-section").forEach((s) => s.classList.remove("active"));
+        document.getElementById(`view-${v}`).classList.add("active");
+        if (v === "build") renderBuildEditor();
+        if (v === "codex") renderCodexBrowser();
+      });
+    });
+
+    document.getElementById("preset-select").addEventListener("change", (e) => {
+      sim.activePresetKey = e.target.value;
+      sim.build = JSON.parse(JSON.stringify(codex.presets[sim.activePresetKey]));
+      resetSimulation(false);
+      renderBuildEditor();
+      renderCombatUI();
+    });
+
+    document.getElementById("encounter-select").addEventListener("change", (e) => {
+      sim.encounterType = e.target.value;
+      resetSimulation(true);
+      renderCombatUI();
+    });
+
+    ["1", "2", "5"].forEach((sp) => {
+      document.getElementById(`btn-speed-${sp}`).addEventListener("click", (e) => {
+        sim.speed = Number(sp);
+        sim.paused = false;
+        ["1", "2", "5"].forEach((x) => document.getElementById(`btn-speed-${x}`).classList.remove("active"));
+        document.getElementById("btn-pause").classList.remove("active");
+        e.target.classList.add("active");
+      });
+    });
+
+    document.getElementById("btn-pause").addEventListener("click", (e) => {
+      sim.paused = !sim.paused;
+      e.target.classList.toggle("active", sim.paused);
+    });
+
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      resetSimulation(true);
+      renderCombatUI();
+    });
+
+    document.getElementById("btn-clear-log").addEventListener("click", () => {
+      sim.logs = [];
+      renderCombatUI();
+    });
+
+    document.getElementById("btn-sim-60").addEventListener("click", () => runHeadlessBatch(600));
+    document.getElementById("btn-sim-300").addEventListener("click", () => runHeadlessBatch(3000));
+    document.getElementById("btn-pin-baseline").addEventListener("click", () => {
+      if (window._lastBatchReport) {
+        sim.baselineReport = JSON.parse(JSON.stringify(window._lastBatchReport));
+        renderBatchReport(window._lastBatchReport);
+      }
+    });
+
+    // Build Assembler changes
+    document.getElementById("build-class-select").addEventListener("change", (e) => {
+      sim.build.classId = e.target.value;
+      renderBuildEditor();
+    });
+
+    ["weapon", "offhand", "armor", "ring", "relic"].forEach((slot) => {
+      document.getElementById(`eq-${slot}`).addEventListener("change", (e) => {
+        sim.build.equip[slot] = e.target.value;
+        renderBuildEditor();
+      });
+    });
+
+    document.getElementById("btn-save-preset").addEventListener("click", () => {
+      const name = prompt("Enter a name for this Build Preset:", `${codex.classes[sim.build.classId].name} Custom Build`);
+      if (!name) return;
+      const key = "preset_" + Date.now();
+      codex.presets[key] = { ...JSON.parse(JSON.stringify(sim.build)), name };
+      sim.activePresetKey = key;
+      saveCodex();
+      renderBuildEditor();
+    });
+
+    // Codex Forge Creators
+    document.getElementById("btn-create-skill").addEventListener("click", () => {
+      const name = document.getElementById("fx-skill-name").value.trim();
+      if (!name) return alert("Enter a Skill Name.");
+      const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+      const trigType = document.getElementById("fx-skill-trigger").value;
+      const numVal = Number(document.getElementById("fx-skill-num").value) || 1;
+      const targetMode = document.getElementById("fx-skill-target").value;
+
+      const skillObj = {
+        id,
+        name,
+        class: document.getElementById("fx-skill-class").value,
+        trigger: trigType === "ACTIVE"
+          ? { type: "ACTIVE" }
+          : trigType === "ON_HIT_TAKEN_STACKS"
+            ? { type: trigType, stackName: document.getElementById("fx-skill-stackname").value || "Reckoning", n: Math.round(numVal) }
+            : { type: trigType, n: Math.round(numVal) },
+        damageType: document.getElementById("fx-skill-dmgtype").value,
+        targeting: targetMode === "CHAIN"
+          ? { mode: "CHAIN", maxTargets: 3, bounceDecay: 0.25 }
+          : targetMode === "CLEAVE"
+            ? { mode: "CLEAVE", splashPct: 0.7 }
+            : { mode: "SINGLE" },
+        powerMult: Number(document.getElementById("fx-skill-mult").value) || 100,
+        resDelta: Number(document.getElementById("fx-skill-res").value) || 0,
+        dotType: document.getElementById("fx-skill-dot").value,
+        cdTicks: trigType === "ACTIVE" ? Math.round(numVal * 10) : 0,
+        castTicks: 0
+      };
+
+      const existingIdx = codex.skills.findIndex((s) => s.id === id);
+      if (existingIdx >= 0) codex.skills[existingIdx] = skillObj;
+      else codex.skills.push(skillObj);
+
+      saveCodex();
+      renderCodexBrowser();
+      alert(`Saved "${name}" (${id}) to Codex!`);
+    });
+
+    document.getElementById("btn-create-item").addEventListener("click", () => {
+      const name = document.getElementById("fx-item-name").value.trim();
+      if (!name) return alert("Enter an Item Name.");
+      const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+
+      const itemObj = {
+        id,
+        name,
+        slot: document.getElementById("fx-item-slot").value,
+        mods: {
+          power: Number(document.getElementById("fx-item-power").value) || 0,
+          haste: Number(document.getElementById("fx-item-haste").value) || 0,
+          crit: Number(document.getElementById("fx-item-crit").value) || 0,
+          morePct: Number(document.getElementById("fx-item-more").value) || 0,
+          conv: document.getElementById("fx-item-conv").value,
+          triggerOffset: Number(document.getElementById("fx-item-offset").value) || 0,
+          armor: 100,
+          hp: 150
+        }
+      };
+
+      const existingIdx = codex.items.findIndex((i) => i.id === id);
+      if (existingIdx >= 0) codex.items[existingIdx] = itemObj;
+      else codex.items.push(itemObj);
+
+      saveCodex();
+      renderCodexBrowser();
+      alert(`Saved "${name}" (${id}) to Codex!`);
+    });
+
+    // JSON Import / Export
+    document.getElementById("btn-export-all").addEventListener("click", () => {
+      document.getElementById("io-textarea").value = JSON.stringify(codex, null, 2);
+      document.getElementById("io-status").textContent = "Exported full Codex JSON.";
+    });
+
+    function runImport(replaceMode) {
+      try {
+        const pack = JSON.parse(document.getElementById("io-textarea").value);
+        if (replaceMode) {
+          codex = pack;
+        } else {
+          if (pack.classes) Object.assign(codex.classes, pack.classes);
+          if (pack.runes) Object.assign(codex.runes, pack.runes);
+          if (pack.presets) Object.assign(codex.presets, pack.presets);
+          if (Array.isArray(pack.skills)) {
+            pack.skills.forEach((sk) => {
+              const idx = codex.skills.findIndex((x) => x.id === sk.id);
+              if (idx >= 0) codex.skills[idx] = sk;
+              else codex.skills.push(sk);
+            });
+          }
+          if (Array.isArray(pack.items)) {
+            pack.items.forEach((it) => {
+              const idx = codex.items.findIndex((x) => x.id === it.id);
+              if (idx >= 0) codex.items[idx] = it;
+              else codex.items.push(it);
+            });
+          }
+          if (Array.isArray(pack.keystones)) {
+            pack.keystones.forEach((ks) => {
+              const idx = codex.keystones.findIndex((x) => x.id === ks.id);
+              if (idx >= 0) codex.keystones[idx] = ks;
+              else codex.keystones.push(ks);
+            });
+          }
+        }
+        saveCodex();
+        renderBuildEditor();
+        renderCodexBrowser();
+        document.getElementById("io-status").textContent = replaceMode ? "Full Codex replaced!" : "Pack merged successfully!";
+      } catch (err) {
+        document.getElementById("io-status").textContent = "Invalid JSON: " + err.message;
+      }
+    }
+
+    document.getElementById("btn-import-merge").addEventListener("click", () => runImport(false));
+    document.getElementById("btn-import-replace").addEventListener("click", () => runImport(true));
+
+    document.getElementById("btn-factory-reset").addEventListener("click", () => {
+      if (!confirm("Reset Codex and Presets back to factory defaults?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      codex = JSON.parse(JSON.stringify(DEFAULT_CODEX));
+      sim.activePresetKey = "templar_retaliation";
+      sim.build = JSON.parse(JSON.stringify(codex.presets.templar_retaliation));
+      resetSimulation(false);
+      renderBuildEditor();
+      renderCodexBrowser();
+      renderCombatUI();
+    });
+
+    // Boot
+    resetSimulation(false);
+    renderBuildEditor();
+    renderCodexBrowser();
+    renderCombatUI();
+
+    setInterval(() => {
+      if (sim.paused) return;
+      for (let i = 0; i < sim.speed; i++) {
+        stepTick();
+      }
+      renderCombatUI();
+    }, 100);
+  </script>
+</body>
 </html>
