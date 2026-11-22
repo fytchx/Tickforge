@@ -1,0 +1,9 @@
+[
+  {"id":"school_physical","name":"Physical","statusAilment":"Stagger","color":"#c9bda8","statusStacks":3,"resistanceMultiplier":0.8,"comboReactionMultipliers":{"physical":1.0,"lightning":1.12,"fire":1.05,"poison":0.9,"bleed":1.18,"frost":1.08,"disease":0.85}},
+  {"id":"school_lightning","name":"Lightning","statusAilment":"Static","color":"#75aaff","statusStacks":5,"resistanceMultiplier":0.82,"comboReactionMultipliers":{"physical":1.08,"lightning":1.0,"fire":1.15,"poison":0.92,"bleed":1.0,"frost":1.1,"disease":0.88}},
+  {"id":"school_fire","name":"Fire","statusAilment":"Burn","color":"#ff7b54","statusStacks":8,"resistanceMultiplier":0.78,"comboReactionMultipliers":{"physical":1.05,"lightning":1.12,"fire":1.0,"poison":1.18,"bleed":1.1,"frost":1.35,"disease":1.05}},
+  {"id":"school_poison","name":"Poison","statusAilment":"Venom","color":"#78c879","statusStacks":10,"resistanceMultiplier":0.84,"comboReactionMultipliers":{"physical":0.95,"lightning":1.05,"fire":1.22,"poison":1.0,"bleed":1.15,"frost":0.92,"disease":1.25}},
+  {"id":"school_bleed","name":"Bleed","statusAilment":"Hemorrhage","color":"#d44a58","statusStacks":7,"resistanceMultiplier":0.86,"comboReactionMultipliers":{"physical":1.12,"lightning":1.0,"fire":1.1,"poison":1.2,"bleed":1.0,"frost":1.02,"disease":1.16}},
+  {"id":"school_frost","name":"Frost","statusAilment":"Chill","color":"#76d6e9","statusStacks":6,"resistanceMultiplier":0.8,"comboReactionMultipliers":{"physical":1.1,"lightning":1.18,"fire":1.35,"poison":0.95,"bleed":1.05,"frost":1.0,"disease":0.9}},
+  {"id":"school_disease","name":"Disease","statusAilment":"Rot","color":"#9bba63","statusStacks":12,"resistanceMultiplier":0.88,"comboReactionMultipliers":{"physical":0.9,"lightning":1.02,"fire":1.08,"poison":1.25,"bleed":1.14,"frost":0.92,"disease":1.0}}
+]

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0e16">
+  <title>Tickforge</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/effects.css">
+  <script src="js/engine.js" defer></script>
+  <script src="js/combat.js" defer></script>
+  <script src="js/ui.js" defer></script>
+</head>
+<body>
+  <main class="tf-app" aria-label="Tickforge combat interface">
+    <header class="tf-header GS-UI-HED">
+      <div class="tf-stage"><span id="zoneName">Ashen March</span><b id="stageCounter">Stage 1</b></div>
+      <div class="tf-health"><span>HP</span><div class="tf-meter"><i id="playerHp"></i></div><b id="hpText">100 / 100</b></div>
+      <div class="tf-resource" aria-label="Holy Power"><span>Holy Power</span><div id="resourcePips"></div></div>
+    </header>
+
+    <section class="tf-board GS-UI-BOARD" id="enemyBoard" aria-label="Enemy battlefield"></section>
+
+    <section class="tf-combat-log" id="combatLog" aria-live="polite"></section>
+
+    <section class="tf-hotbar GS-UI-SKL" id="hotbar" aria-label="Action hotbar"></section>
+
+    <nav class="tf-nav" aria-label="Primary navigation">
+      <button class="active" data-tab="Deck">Deck</button>
+      <button data-tab="Gear">Gear</button>
+      <button data-tab="Forge">Forge</button>
+      <button data-tab="Leaderboard">Leaderboard</button>
+    </nav>
+  </main>
+</body>
+</html>

@@ -1,0 +1,9 @@
+.screen-shake { animation: screen-shake 180ms linear; }
+@keyframes screen-shake { 20% { transform: translate(-3px,1px); } 40% { transform: translate(3px,-1px); } 60% { transform: translate(-2px,-2px); } 80% { transform: translate(2px,2px); } }
+@keyframes float-combat { from { transform: translateY(0) scale(.9); opacity:1 } to { transform: translateY(-54px) scale(1.12); opacity:0 } }
+.fx-cull-low .particle { display:none !important; }
+.fx-cull-all .particle,.fx-cull-all .shader { display:none !important; }
+.hotbar-slot.mash { animation:mash 120ms ease-out; }
+@keyframes mash { 50% { transform:scale(.88);filter:brightness(1.35); } }
+.gcd-sweep { animation:gcd-sweep 1200ms linear; }
+@keyframes gcd-sweep { from { clip-path:conic-gradient(var(--tf-accent-primary) 360deg,transparent 0); } to { clip-path:conic-gradient(var(--tf-accent-primary) 0deg,transparent 0); } }

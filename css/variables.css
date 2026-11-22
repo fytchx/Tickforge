@@ -1,0 +1,30 @@
+:root {
+  --tf-bg-core: #0b0e16;
+  --tf-bg-surface: #121824;
+  --tf-bg-card: #1a2234;
+  --tf-border-subtle: #2a364f;
+  --tf-accent-primary: #bba4ff;
+  --tf-accent-glow: rgba(187, 164, 255, 0.25);
+  --tf-accent-gold: #ffd700;
+  --tf-danger: #ef6f7d;
+  --tf-success: #67c995;
+  --tf-radius: 12px;
+  --tf-school-physical: #c9bda8;
+  --tf-school-lightning: #75aaff;
+  --tf-school-fire: #ff7b54;
+  --tf-school-poison: #78c879;
+  --tf-school-bleed: #d44a58;
+  --tf-school-frost: #76d6e9;
+  --tf-school-disease: #9bba63;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--tf-bg-core);
+  color: #f5f5fb;
+  font: 14px/1.45 system-ui, -apple-system, sans-serif;
+}
+button { font: inherit; }
